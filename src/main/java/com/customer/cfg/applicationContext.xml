@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+        
+        
+            <!-- dependent Class -->
+            
+            <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dSource">
+            
+            <property name="driverClassName" value="${jdbc.driver}"></property>
+           <!--  <property name="url" value="jdbc:mysql://localhost:3306/spring_demo"></property> -->
+            <property name="username" value="${jdbc.username}"></property>
+            <property name="password" value="${jdbc.pass}"></property> 
+            </bean>
+            
+            <bean id="hikariCp" class="com.zaxxer.hikari.HikariDataSource" parent="dSource">
+            
+             <property name="JdbcUrl" value="${jdbc.url}"></property>
+             <property name="minimumIdle" value="10"></property>
+             <property name="MaximumPoolSize" value="20"></property>
+             <property name="ConnectionTimeout" value="2000"></property>
+            
+            </bean>
+
+
+            <!-- target Class -->
+            
+            <bean id="CustDaoImpl" class="com.customer.dao.CustomerDaoImpl">
+            
+            <constructor-arg ref="hikariCp"></constructor-arg>
+            </bean>
+            <bean id="custService" class="com.customer.service.CustomerService">
+            <constructor-arg ref="CustDaoImpl"></constructor-arg>
+            </bean>
+            
+            <bean id="custControl" class="com.customer.controller.CustomerController">
+            
+            <constructor-arg ref="custService"></constructor-arg>
+            
+            </bean>
+            
+            <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" >
+            
+            <property name="Location" value="com/customer/cfg/Jdbc.properties"></property>
+            
+            </bean>
+
+</beans>
